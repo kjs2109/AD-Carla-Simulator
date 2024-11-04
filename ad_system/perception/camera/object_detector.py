@@ -83,7 +83,7 @@ class PVDetector:
         distance = target.get_transform().location.distance(actor.get_transform().location) 
 
         results = [] 
-        if distance < 100: 
+        if distance < 130: 
             forward_vec = actor.get_transform().get_forward_vector()  
             ray = target.get_transform().location - actor.get_transform().location 
 
