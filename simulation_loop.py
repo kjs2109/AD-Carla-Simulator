@@ -100,7 +100,7 @@ def main(saved_root, test_name, scenario_path, scenario_params):
 
 if __name__ == '__main__':
     saved_root = '/home/k/AD-Carla-Simulator/saved'
-    test_name = 'relative_speed_headway_distance-17'
+    test_name = 'test'
     scenario_path = './scenario/ACC_logical.xosc'
 
     # km/h 
