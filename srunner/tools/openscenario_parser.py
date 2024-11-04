@@ -530,7 +530,7 @@ class OpenScenarioParser(object):
             if prop.attrib.get('name') == "module":
                 module = prop.attrib.get('value')
             else:
-                args[prop.attrib.get('name')] = prop.attrib.get('value')
+                args[prop.attrib.get('name')] = prop.attrib.get('value') 
 
         override_action = xml_tree.find('OverrideControllerValueAction')
         for child in override_action:
