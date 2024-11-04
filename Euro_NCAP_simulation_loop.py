@@ -29,7 +29,6 @@ def start_carla_server():
     """Start the Carla server."""
     try:
         command = ['bash', '-c', f'cd {os.path.dirname(os.path.abspath(__file__))} && ./carla_simulator/CarlaUE4.sh --quality-level=Low -RenderOffScreen'] 
-        # command = ['python', 'start_cala_server.py']
         subprocess.Popen(command)  
         print('서버 실행 중...')
         time.sleep(5) 
