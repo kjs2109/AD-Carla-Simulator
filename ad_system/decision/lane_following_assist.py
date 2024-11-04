@@ -1,6 +1,7 @@
 import math
 import numpy as np
 from itertools import combinations
+from collections import deque 
 
 LFA_MODE = 0
 LOW_SPEED_MODE = 0
@@ -15,7 +16,7 @@ NUMBER_TWO = 2
 LANE_WIDTH_THRESHOLD = 2
 MODE_CONVERSION_SPEED_KPH = 70
 
-PREV_EGO_LANE = None 
+PREV_EGO_LANE = deque([None],maxlen=10)
 
 def lane_following_assist_purepursuit(lane_info : list, ego_velocity : list):
     target_lane = find_ego_lane(lane_info)
@@ -68,7 +69,7 @@ def calculate_steer_in_low_speed_purepursuit(target_lane):
 
 def calculate_steer_in_high_speed_purepursuit(target_lane):
     wheelbase = 5
-    lookahead_distance = 60
+    lookahead_distance = 70
 
     target_lane_y = sum([(lookahead_distance - n) / m for m, n in target_lane]) / 2
 
@@ -96,9 +97,9 @@ def find_ego_lane(lane_info : list):
             min_abs_indices = [filterd_lane_start_points.index(value) for value in sorted(filterd_lane_start_points, key = abs)[:2]]
             ego_lane = [filter_lane_info[i] for i in min_abs_indices]
 
-    if ego_lane is None:
-        ego_lane = PREV_EGO_LANE 
+    if ego_lane is None and len(PREV_EGO_LANE) > 0:
+        ego_lane = PREV_EGO_LANE.pop() 
     else:
-        PREV_EGO_LANE = ego_lane
+        PREV_EGO_LANE.append(ego_lane)
 
     return ego_lane
