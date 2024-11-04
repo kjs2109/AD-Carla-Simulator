@@ -108,6 +108,30 @@ def get_actor_display_name(actor, truncate=250):
     return (name[:truncate - 1] + u'\u2026') if len(name) > truncate else name
 
 
+def set_vehicle_physics(actor):
+
+    physics_control = actor.get_physics_control() 
+
+    front_left_wheel  = carla.WheelPhysicsControl(tire_friction=1.0, max_steer_angle=70, long_stiff_value = 3500, lat_stiff_value=20)
+    front_right_wheel = carla.WheelPhysicsControl(tire_friction=1.0, max_steer_angle=70, long_stiff_value = 3500, lat_stiff_value=20)
+    rear_left_wheel   = carla.WheelPhysicsControl(tire_friction=1.0, max_steer_angle=0, long_stiff_value = 3500, lat_stiff_value=20)
+    rear_right_wheel  = carla.WheelPhysicsControl(tire_friction=1.0, max_steer_angle=0, long_stiff_value = 3500, lat_stiff_value=20)
+
+    wheels = [front_left_wheel, front_right_wheel, rear_left_wheel, rear_right_wheel]
+
+    physics_control.moi = 1.1
+    physics_control.damping_rate_full_throttle = 0.15
+    physics_control.damping_rate_zero_throttle_clutch_engaged = 0.15
+    physics_control.damping_rate_zero_throttle_clutch_disengaged = 0.15
+    physics_control.mass = 1845
+    physics_control.wheels = wheels
+
+
+
+    actor.apply_physics_control(physics_control)
+    print(physics_control)
+
+
 # ==============================================================================
 # -- World ---------------------------------------------------------------------
 # ==============================================================================
@@ -159,6 +183,8 @@ class World(object):
             for vehicle in possible_vehicles:
                 if vehicle.attributes['role_name'] == 'hero':
                     print("Ego vehicle found")
+                    vehicle.show_debug_telemetry(True) 
+                    set_vehicle_physics(vehicle)
                     self.player = vehicle
                     break
         
