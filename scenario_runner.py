@@ -505,6 +505,29 @@ class ScenarioRunner(object):
                 openscenario_params[key] = val
         config = OpenScenarioConfiguration(self._args.openscenario, self.client, openscenario_params)
 
+        try: 
+            vut_target_velo = openscenario_params['VUT_target_velo']
+            headway_time = openscenario_params['headway_time']
+
+            ###################################################################################################
+            root = config.xml_tree.getroot()
+            for controller_action in root.findall(".//ControllerAction"):
+                properties = controller_action.find(".//Properties")
+                if properties is not None:
+                    for prop in properties.findall("Property"):
+                        name = prop.get('name')
+                        if name == "target_velocity":
+                            print(f"Updating target_velocity from {prop.get('value')} to {vut_target_velo}")
+                            
+                            prop.set('value', vut_target_velo)  # Set new target velocity
+                        if name == "headway_time": 
+                            print(f"Updating headway_time from {prop.get('value')} to {headway_time}")
+                            
+                            prop.set('value', headway_time)
+            ####################################################################################################
+        except: 
+            pass 
+
         result = self._load_and_run_scenario(config)
 
         self._cleanup()
