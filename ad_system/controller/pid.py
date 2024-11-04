@@ -68,7 +68,7 @@ class SpeedPidController:
 class RelativeSpeedPidController: 
 
     def __init__(self, dt): 
-        self.relative_velocity_pid = PidModule(kp=1, ki=0.001, kd=0.1, dt=dt) 
+        self.relative_velocity_pid = PidModule(kp=0.5, ki=0.001, kd=0.05, dt=dt)  # PidModule(kp=1.0, ki=0.001, kd=0.1, dt=dt) 
 
         self.relative_velocity_error = 0
 
