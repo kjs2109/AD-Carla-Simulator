@@ -26,9 +26,9 @@
 
     <ParameterDeclaration name="ego_height" parameterType="double" value="5" />
 
-    <ParameterDeclaration name="weather_condition" parameterType="string" value="rain" />
-    <ParameterDeclaration name="precipitationType_intensity" parameterType="double" value="1.0" />
-    <ParameterDeclaration name="cloud_State" parameterType="string" value="free" />
+    <ParameterDeclaration name="weather_condition" parameterType="string" value="clear" />
+    <ParameterDeclaration name="precipitationType_intensity" parameterType="double" value="0.5" />
+    <ParameterDeclaration name="cloud_State" parameterType="string" value="clear" />
     <ParameterDeclaration name="fog_range" parameterType="double" value="100.0" />
   </ParameterDeclarations>
 
