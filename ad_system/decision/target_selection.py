@@ -1,10 +1,12 @@
 from itertools import combinations
 from collections import defaultdict
+from collections import deque 
 
 LANE_WIDTH_THRESHOLD = 2.7
 NUMBER_TWO = 2
 PREDICTION_TIME = 3 
 PREV_EGO_LANE = None 
+TARGET_MEMORY = deque([None], maxlen=10)
 
 def target_selection_preceding(target_candidates, lane_info, ego_velocity):
     target = None
@@ -26,6 +28,11 @@ def target_selection_preceding(target_candidates, lane_info, ego_velocity):
 
         if preceding_candidates:
             target = sorted(preceding_candidates, key = lambda x : x[-1])[0][0:-1]  # 예측 종방향 거리가 가장 짧은 후보 선택
+
+    if target is None and len(TARGET_MEMORY) > 0: 
+        target = TARGET_MEMORY.pop() 
+    else: 
+        TARGET_MEMORY.append(target)
 
     return target
 
