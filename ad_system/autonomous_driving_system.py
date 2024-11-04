@@ -26,7 +26,6 @@ from decision import ACCSystem, arbitration, target_selection_preceding, lane_fo
 from controller import engine_control, brake_control, steer_control 
 
 
-
 class AutonomousDrivingSystem(BasicControl): 
 
     def __init__(self, actor, args=None): 
@@ -38,19 +37,27 @@ class AutonomousDrivingSystem(BasicControl):
         # synchronous mode 
         self.dt = 0.02  # 50 FPS
         self._set_synchronous_mode(fixed_delta_seconds=self.dt)  
-
+        if 'target_velocity' in args.keys(): 
+            self.target_velocity = float(args['target_velocity']) * 3.6  # km/h 
+        else: 
+            self.target_velocity = 130  # km/h
+        if 'headway_time' in args.keys(): 
+            self.headway_time = float(args['headway_time'])
+        else: 
+            self.headway_time = 1.8
         # driving log 
         self.ego_velocity_logging = [] 
         self.target_velocity_logging = [] 
         self.ego_acceleration_logging = [] 
         self.ego_target_distance_logging = [] 
-        self.desired_acceleration_logging = []
+        self.desired_acceleration_logging = [] 
         self.time_to_collision_logging = [] 
         self.headway_time_logging = []
         self.acc_mode_logging = [] 
 
         # initialization 
         self._init_control() 
+        self._set_vehicle_physics()
         self._actor.show_debug_telemetry(True) 
 
         self.farthest_depth = 1000 # m
@@ -76,8 +83,7 @@ class AutonomousDrivingSystem(BasicControl):
 
         self.pv_detector = PVDetector(self.intrinsic_parameters) 
         self.lane_detector = LaneDetector(self.intrinsic_parameters) 
-        self.acc_system = ACCSystem(desired_velocity_kph=50, desired_distance=30, maximum_acc_distance=80, dt=self.dt) 
-        # self.pid_controller = PidController(headway_time=2, distance_gains=[0.5, 0, 0], velocity_gains=[0.1, 0, 0], dt=self.dt) 
+        self.acc_system = ACCSystem(desired_velocity_kph=self.target_velocity, headway_time=self.headway_time, desired_distance=30, maximum_acc_distance=50, dt=self.dt) 
 
     def _set_synchronous_mode(self, fixed_delta_seconds=0.05):
 
@@ -94,6 +100,35 @@ class AutonomousDrivingSystem(BasicControl):
         self.control.steer = 0 
         self.control.throttle = 0 
         self.control.brake = 0 
+    
+    def _set_vehicle_physics(self):
+
+        physics_control = self._actor.get_physics_control() 
+
+        front_left_wheel  = carla.WheelPhysicsControl(tire_friction=1.0, max_steer_angle=70)
+        front_right_wheel = carla.WheelPhysicsControl(tire_friction=1.0, max_steer_angle=70) 
+        rear_left_wheel   = carla.WheelPhysicsControl(tire_friction=1.0, max_steer_angle=0) 
+        rear_right_wheel  = carla.WheelPhysicsControl(tire_friction=1.0, max_steer_angle=0) 
+
+        wheels = [front_left_wheel, front_right_wheel, rear_left_wheel, rear_right_wheel]
+
+        physics_control.moi = 1.0
+        physics_control.damping_rate_full_throttle = 0.15
+        physics_control.damping_rate_zero_throttle_clutch_engaged = 0.15
+        physics_control.damping_rate_zero_throttle_clutch_disengaged = 0.15
+        physics_control.mass = 1845
+        physics_control.wheels = wheels
+
+        max_torque = max([x.y for x in physics_control.torque_curve])
+        self.max_acceleration = (max_torque * physics_control.final_ratio) / (physics_control.mass * physics_control.wheels[0].radius / 100) 
+        
+        max_brake_torque = max([x.max_brake_torque for x in physics_control.wheels])
+        self.max_deceleration = max_brake_torque / (physics_control.mass * physics_control.wheels[0].radius / 100)
+
+        self._actor.apply_physics_control(physics_control)
+        # print('max_acceleration: ', self.max_acceleration, 'max_deceleration: ', self.max_deceleration)
+        # print(physics_control)
+
 
     # imu sensor 
     def _set_imu_sensor(self): 
@@ -222,12 +257,19 @@ class AutonomousDrivingSystem(BasicControl):
         spectator_transform.location.x += 0
         spectator_transform.location.z += 13
         spectator_transform.location.y += 10  
-        spectator_transform.rotation.pitch = -30
+        spectator_transform.rotation.pitch = -30 
+
+        # spectator_transform = self._actor.get_transform()
+        # spectator_transform.location.x += 5 #  0
+        # spectator_transform.location.z += 3 # 13
+        # spectator_transform.location.y += 10  
+        # spectator_transform.rotation.pitch = -30 
+        # spectator_transform.rotation.yaw = -110
         self.spectator.set_transform(spectator_transform) 
 
 
     def reset(self):
-        self.save_log('./saved/relative_speed_headway_distance-17')
+        self.save_log('./saved/test')
         print('======================= autonomous system is terminated ... =======================') 
         print('simulation time: ', round(time.time() - self.tick, 2), 's')
 
@@ -335,18 +377,26 @@ class AutonomousDrivingSystem(BasicControl):
         # arbitration
         acceleration_by_aeb = None 
         desired_acceleration, desired_steer = arbitration(acceleration_by_acc, acceleration_by_aeb, steer_by_lfa)
-
+        
         # logging
         self._log_driving_data(ego_vehicle_speed, target_vehicle_speed, ego_acceleration, ego_target_distance, desired_acceleration, self.acc_system.ACC_MODE) 
 
 
         """ Control """
+        steer = steer_control.calc_steer_command(desired_steer) 
+        throttle = engine_control.calc_engine_control_command(desired_acceleration, self.max_acceleration)  
+        brake = brake_control.calc_brake_command(desired_acceleration, self.max_deceleration)
 
-        self.control.throttle = engine_control.calc_engine_control_command(desired_acceleration)
-        self.control.brake = brake_control.calc_brake_command(desired_acceleration)
-        self.control.steer = steer_control.calc_steer_command(desired_steer)
-        self._actor.apply_control(self.control)
+        if abs(round(steer, 2)) > 0.1: 
+            self.control.steer = steer 
+            self.control.throttle = 0
+            self.control.brake = 0
+        else: 
+            self.control.steer = 0 
+            self.control.throttle = throttle
+            self.control.brake = brake
 
-
+        self._actor.apply_control(self.control) 
+        # print(f'{round(throttle, 3):<6} | {round(brake, 3):<6}')
         self._spectator_update()
 
