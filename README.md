@@ -1,5 +1,5 @@
 # Introduction 
-### Simulaion Loop 
+### Simulation Loop 
 ![simulation loop](./src/simulation_loop.png) 
 * 운영 설계 영역과 시험평가 표준을 고려한 Functional Scenario 도출 
 * OpenDrive 형식의 도로와 OpenScenario 형식의 Logical Scenario 제작 
