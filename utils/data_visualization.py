@@ -146,7 +146,7 @@ def log_visualization_with_acc_mode(file_path):
 
     # 우측 y축 레이블 및 범위 설정
     ax2.set_ylabel('Distance (m)')
-    ax2.set_ylim(0, 60) 
+    ax2.set_ylim(0, 150) 
     ax2.legend(loc='upper right')
 
     ax1.set_xlim(0, 45)
@@ -334,7 +334,7 @@ def visualize_all(file_path, dt):
     plt.title('Velocity Over Time')
     plt.ylabel('Velocity (m/s)')
     plt.legend()
-    plt.ylim(0, 25)
+    plt.ylim(0, 40)
 
     # 그리드 설정
     ax1 = plt.gca()
@@ -352,7 +352,7 @@ def visualize_all(file_path, dt):
     plt.title('Acceleration Over Time')
     plt.ylabel('Acceleration (m/s²)')
     plt.legend()
-    plt.ylim(-10, 10)
+    plt.ylim(-15, 15)
 
     # 그리드 설정
     ax2 = plt.gca()
@@ -370,7 +370,7 @@ def visualize_all(file_path, dt):
     plt.xlabel('Time (s)')
     plt.ylabel('Jerk (m/s³)')
     plt.legend()
-    plt.ylim(-10, 10)
+    plt.ylim(-15, 15)
 
     # 그리드 설정
     ax3 = plt.gca()
@@ -391,6 +391,7 @@ def visualize_all_comparison(file_paths, dt):
     window_size = int(1 / dt)
 
     # 데이터 프레임과 시간 생성
+    label_names = [] 
     velocities = []
     accelerations = []
     times = []
@@ -400,6 +401,9 @@ def visualize_all_comparison(file_paths, dt):
         time = pd.Series(range(len(data))) * dt
         times.append(time)
 
+        exp_name = file_path.split('/')[-2] 
+        label_name = f'Vvut: {exp_name.split("-")[-2]}, Vgvt: {exp_name.split("-")[-1]}'
+        label_names.append(label_name)
         velocities.append(data['ego_velocity'])
         accelerations.append(data['ego_acceleration'])
 
@@ -420,29 +424,29 @@ def visualize_all_comparison(file_paths, dt):
     # 첫 번째 서브플롯: 속도
     plt.subplot(3, 1, 1)
     for i in range(num_files):
-        plt.plot(times[i], velocity_filtered[i], label=f'Velocity (File {i + 1})')
-    plt.title('Velocity Comparison Over Time')
+        plt.plot(times[i], velocity_filtered[i], label=label_names[i])
+    plt.title('Velocity')
     plt.ylabel('Velocity (m/s)')
-    plt.legend()
-    plt.ylim(0, 25)
+    plt.legend(loc='upper right')
+    plt.ylim(0, 40)
 
     # 두 번째 서브플롯: 가속도
     plt.subplot(3, 1, 2)
     for i in range(num_files):
-        plt.plot(times[i], acceleration_filtered[i], label=f'Acceleration (File {i + 1})')
-    plt.title('Acceleration Comparison Over Time')
+        plt.plot(times[i], acceleration_filtered[i], label=label_names[i])
+    plt.title('Acceleration')
     plt.ylabel('Acceleration (m/s²)')
-    plt.legend()
-    plt.ylim(-10, 10)
+    plt.legend(loc='upper right')
+    plt.ylim(-15, 15)
 
     # 세 번째 서브플롯: 가가속도
     plt.subplot(3, 1, 3)
     for i in range(num_files):
-        plt.plot(times[i], jerk_acceleration_filtered[i], label=f'Jerk from Acceleration (File {i + 1})')
-    plt.title('Jerk Comparison Over Time')
+        plt.plot(times[i], jerk_acceleration_filtered[i], label=label_names[i])
+    plt.title('Jerk')
     plt.xlabel('Time (s)')
     plt.ylabel('Jerk (m/s³)')
-    plt.legend()
+    plt.legend(loc='upper right')
     plt.ylim(-15, 15)
 
     plt.tight_layout()
