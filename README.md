@@ -9,7 +9,7 @@
 ### ACC System 
 ![ad system](./src/ad_system.png)
 ### Experiment Result 
-* Euro NCAP CCRm 시나리오에 대한 시험 평가 결과 
+* Euro NCAP CCRm 시나리오에 대한 시험 평가
 <img src="./src/CCRm_scenario.png" alt="CCRm scenario" width="500"/>
 <img src="./src/test_result.png" alt="Euro NCAP test result" width="500"/>
 
