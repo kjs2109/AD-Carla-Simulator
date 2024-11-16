@@ -8,8 +8,11 @@
 * [pyenv](https://github.com/pyenv/pyenv) 
 
 # Installation 
-1. Source Code Clone 
-2. Create Python Environment 
+1. Clone Source Code
+```
+git clone https://github.com/kjs2109/AD-Carla-Simulator.git
+```
+3. Create Python Environment 
 ```
 $ pyenv install 3.7 
 $ pyenv local 3.7
