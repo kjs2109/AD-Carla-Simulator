@@ -123,7 +123,7 @@ class AutonomousDrivingSystem(BasicControl):
         self.max_acceleration = (max_torque * physics_control.final_ratio) / (physics_control.mass * physics_control.wheels[0].radius / 100) 
         
         max_brake_torque = max([x.max_brake_torque for x in physics_control.wheels])
-        self.max_deceleration = max_brake_torque / (physics_control.mass * physics_control.wheels[0].radius / 100)
+        self.max_deceleration = (max_brake_torque * 4) / (physics_control.mass * physics_control.wheels[0].radius / 100)
 
         self._actor.apply_physics_control(physics_control)
         # print('max_acceleration: ', self.max_acceleration, 'max_deceleration: ', self.max_deceleration)
