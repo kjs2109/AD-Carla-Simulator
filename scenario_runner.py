@@ -506,8 +506,14 @@ class ScenarioRunner(object):
         config = OpenScenarioConfiguration(self._args.openscenario, self.client, openscenario_params)
 
         try: 
-            vut_target_velo = openscenario_params['VUT_target_velo']
-            headway_time = openscenario_params['headway_time']
+            if 'VUT_target_velo' in openscenario_params:
+                vut_target_velo = openscenario_params['VUT_target_velo']
+            else: 
+                vut_target_velo = 22.22
+            if 'headway_time' in openscenario_params:
+                headway_time = openscenario_params['headway_time']
+            else: 
+                headway_time = 2.4
 
             ###################################################################################################
             root = config.xml_tree.getroot()
