@@ -36,7 +36,7 @@ def lane_following_assist_purepursuit(lane_info : list, ego_velocity : list):
 def lfa_mode_selection(low_speed_steer, high_speed_steer, ego_velocity):
     global LFA_MODE, HIGH_SPEED_MODE_PREV_ERROR, HIGH_SPEED_MODE_INTEGRAL, LOW_SPEED_MODE_PREV_ERROR, LOW_SPEED_MODE_INTEGRAL
 
-    EGO_SPEED_KPH = ego_velocity[0]
+    EGO_SPEED_KPH = ego_velocity[0] * 3.6
 
     if LFA_MODE == LOW_SPEED_MODE:
         if EGO_SPEED_KPH >= MODE_CONVERSION_SPEED_KPH:
@@ -54,6 +54,7 @@ def lfa_mode_selection(low_speed_steer, high_speed_steer, ego_velocity):
         LOW_SPEED_MODE_PREV_ERROR = 0
         LOW_SPEED_MODE_INTEGRAL = 0
 
+    print("LFA_MODE: ", LFA_MODE)
     return steer
 
 
