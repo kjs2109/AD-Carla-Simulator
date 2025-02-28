@@ -13,6 +13,8 @@
 <img src="./src/CCRm_scenario.png" alt="CCRm scenario" width="500"/>
 <img src="./src/test_result.png" alt="Euro NCAP test result" width="500"/>
 
+![프레젠테이션1-min_compressed](https://github.com/user-attachments/assets/fc6d5a32-d802-45cc-a832-c457eeeb8efb)
+
 # Prerequisite 
 * OS: Ubuntu (18.04+)
 * [pyenv](https://github.com/pyenv/pyenv) 
